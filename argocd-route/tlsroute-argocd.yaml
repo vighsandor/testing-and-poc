@@ -1,0 +1,22 @@
+# TLSRoute - ArgoCD HTTPS passthrough
+# A Gateway NEM bontja a TLS-t, közvetlenül az ArgoCD kezeli
+# Így a self-signed cert megmarad
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: argocd-tls-route
+  namespace: argocd
+spec:
+  parentRefs:
+    - name: gwpoc-gateway
+      namespace: default
+      sectionName: https-passthrough
+  
+  hostnames:
+    - "argocd.gwpoc.local"
+  
+  rules:
+    - backendRefs:
+        - name: argocd-server
+          port: 443
