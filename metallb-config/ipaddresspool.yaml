@@ -1,0 +1,12 @@
+# MetalLB IP Address Pool
+# Ez definiálja milyen IP címeket oszthat ki a LoadBalancer Service-eknek
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    # A node IP címe - ezen fog működni a Gateway 80/443 porton
+    - 10.0.0.108/32
