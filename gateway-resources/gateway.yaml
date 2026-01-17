@@ -1,4 +1,5 @@
 # Gateway - gwpoc.local domain
+# HTTP (80) + HTTPS passthrough (443)
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -9,6 +10,7 @@ spec:
   gatewayClassName: nginx
   
   listeners:
+    # HTTP listener - poc-app és egyéb HTTP alkalmazásokhoz
     - name: http
       port: 80
       protocol: HTTP
@@ -16,3 +18,18 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    
+    # HTTPS passthrough listener - ArgoCD-hez
+    # A TLS-t NEM a Gateway terminálja, hanem átengedi a backend-nek
+    - name: https-passthrough
+      port: 443
+      protocol: TLS
+      hostname: "argocd.gwpoc.local"
+      tls:
+        mode: Passthrough
+      allowedRoutes:
+        namespaces:
+          from: All
+        kinds:
+          - kind: TLSRoute
+  
