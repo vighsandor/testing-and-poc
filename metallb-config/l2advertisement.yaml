@@ -1,0 +1,11 @@
+# MetalLB L2 Advertisement
+# Layer 2 módban hirdeti az IP címeket (ARP)
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - default-pool
