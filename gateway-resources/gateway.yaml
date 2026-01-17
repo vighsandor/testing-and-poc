@@ -1,0 +1,18 @@
+# Gateway - gwpoc.local domain
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gwpoc-gateway
+  namespace: default
+spec:
+  gatewayClassName: nginx
+  
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      hostname: "*.gwpoc.local"
+      allowedRoutes:
+        namespaces:
+          from: All
