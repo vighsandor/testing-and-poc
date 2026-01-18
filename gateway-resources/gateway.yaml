@@ -13,11 +13,6 @@ metadata:
 spec:
   gatewayClassName: nginx
   
-  # Explicit IP cím - MetalLB ezt fogja kiosztani
-  addresses:
-    - type: IPAddress
-      value: "10.0.0.108"
-  
   # Infrastructure - annotációk a létrehozott Service-re
   # MetalLB IP sharing engedélyezése
   infrastructure:
