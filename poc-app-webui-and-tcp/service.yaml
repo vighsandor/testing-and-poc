@@ -1,5 +1,5 @@
-# RabbitMQ Service
-# AMQP (5672) + Management UI (15672)
+# RabbitMQ Service - Management UI (ClusterIP)
+# A webes felületet a Gateway API HTTPRoute-tal érjük el
 ---
 apiVersion: v1
 kind: Service
@@ -9,14 +9,32 @@ metadata:
   labels:
     app: poc-app-webui-and-tcp
 spec:
+  type: ClusterIP
+  selector:
+    app: poc-app-webui-and-tcp
+  ports:
+    - name: management
+      port: 15672
+      targetPort: 15672
+      protocol: TCP
+---
+# RabbitMQ Service - AMQP (LoadBalancer)
+# Külön LoadBalancer Service, mert az NGINX Gateway Fabric 2.3.0
+# még NEM támogatja a TCPRoute-ot (csak HTTP, HTTPS, TLS)
+# A MetalLB ad neki IP-t
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-app-webui-and-tcp-amqp
+  namespace: poc-app-webui-and-tcp
+  labels:
+    app: poc-app-webui-and-tcp
+spec:
+  type: LoadBalancer
   selector:
     app: poc-app-webui-and-tcp
   ports:
     - name: amqp
       port: 5672
       targetPort: 5672
-      protocol: TCP
-    - name: management
-      port: 15672
-      targetPort: 15672
       protocol: TCP
