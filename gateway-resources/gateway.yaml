@@ -13,6 +13,12 @@ metadata:
 spec:
   gatewayClassName: nginx
   
+  # Infrastructure - annotációk a létrehozott Service-re
+  # MetalLB IP sharing engedélyezése
+  infrastructure:
+    annotations:
+      metallb.io/allow-shared-ip: "gwpoc-shared"
+  
   listeners:
     # HTTP listener - webes alkalmazásokhoz
     - name: http
