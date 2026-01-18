@@ -1,5 +1,9 @@
 # Gateway - gwpoc.local domain
-# HTTP (80) + HTTPS passthrough (443) + TCP AMQP (5672)
+# HTTP (80) + HTTPS passthrough (443)
+#
+# MEGJEGYZÉS: TCP listener NINCS, mert az NGINX Gateway Fabric 2.3.0
+# még nem támogatja a TCPRoute-ot. TCP szolgáltatásokhoz (pl. AMQP)
+# használj külön LoadBalancer Service-t.
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -31,13 +35,3 @@ spec:
           from: All
         kinds:
           - kind: TLSRoute
-    
-    # TCP listener - RabbitMQ AMQP porthoz
-    - name: tcp-amqp
-      port: 5672
-      protocol: TCP
-      allowedRoutes:
-        namespaces:
-          from: All
-        kinds:
-          - kind: TCPRoute
