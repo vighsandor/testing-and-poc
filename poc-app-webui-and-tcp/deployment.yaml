@@ -41,14 +41,20 @@ spec:
               cpu: 500m
               memory: 512Mi
           readinessProbe:
-            httpGet:
-              path: /api/health/checks/alarms
-              port: 15672
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - check_running
             initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /api/health/checks/alarms
-              port: 15672
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
             initialDelaySeconds: 30
             periodSeconds: 20
+            timeoutSeconds: 10
