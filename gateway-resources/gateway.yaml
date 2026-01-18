@@ -1,5 +1,5 @@
 # Gateway - gwpoc.local domain
-# HTTP (80) + HTTPS passthrough (443)
+# HTTP (80) + HTTPS passthrough (443) + TCP AMQP (5672)
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -10,7 +10,7 @@ spec:
   gatewayClassName: nginx
   
   listeners:
-    # HTTP listener - poc-app és egyéb HTTP alkalmazásokhoz
+    # HTTP listener - webes alkalmazásokhoz
     - name: http
       port: 80
       protocol: HTTP
@@ -20,7 +20,6 @@ spec:
           from: All
     
     # HTTPS passthrough listener - ArgoCD-hez
-    # A TLS-t NEM a Gateway terminálja, hanem átengedi a backend-nek
     - name: https-passthrough
       port: 443
       protocol: TLS
@@ -32,4 +31,13 @@ spec:
           from: All
         kinds:
           - kind: TLSRoute
-  
+    
+    # TCP listener - RabbitMQ AMQP porthoz
+    - name: tcp-amqp
+      port: 5672
+      protocol: TCP
+      allowedRoutes:
+        namespaces:
+          from: All
+        kinds:
+          - kind: TCPRoute
