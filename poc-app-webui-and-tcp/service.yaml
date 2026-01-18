@@ -21,7 +21,7 @@ spec:
 # RabbitMQ Service - AMQP (LoadBalancer)
 # Külön LoadBalancer Service, mert az NGINX Gateway Fabric 2.3.0
 # még NEM támogatja a TCPRoute-ot (csak HTTP, HTTPS, TLS)
-# A MetalLB ad neki IP-t
+# A MetalLB ad neki IP-t (megosztva a Gateway-jel)
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,8 +29,12 @@ metadata:
   namespace: poc-app-webui-and-tcp
   labels:
     app: poc-app-webui-and-tcp
+  annotations:
+    # MetalLB IP megosztás - ugyanazt az IP-t használja mint a Gateway
+    metallb.io/allow-shared-ip: "gwpoc-shared"
 spec:
   type: LoadBalancer
+  loadBalancerIP: 10.0.0.108
   selector:
     app: poc-app-webui-and-tcp
   ports:
