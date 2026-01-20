@@ -1,0 +1,28 @@
+Működés
+=======
+
+A TLS Passthrough azt jelenti, hogy a Gateway NEM bontja fel a TLS kapcsolatot - egyszerűen átirányítja a 443-as forgalmat az ArgoCD-nek, aki a saját self-signed cert-jével válaszol.
+
+
+Telepítés sorrendje
+===================
+
+# 1. Frissítsd a gateway-resources/gateway.yaml-t a Git repo-ban
+#    (az új HTTPS passthrough listenerrel)
+
+# 2. Hozd létre az argocd-route/ könyvtárat a repo-ban
+#    és tedd bele a tlsroute-argocd.yaml-t
+
+# 3. Git push
+
+# 4. ApplicationSet alkalmazása
+kubectl apply -f applicationset-argocd-route.yaml
+```
+
+---
+
+## Elérés
+```
+https://argocd.gwpoc.local/
+
+

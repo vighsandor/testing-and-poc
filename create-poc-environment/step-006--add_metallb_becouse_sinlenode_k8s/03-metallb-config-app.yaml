@@ -1,0 +1,35 @@
+# MetalLB konfiguráció ArgoCD-ből
+# FONTOS: Ez a MetalLB UTÁN kell szinkronizálódjon!
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"  # MetalLB után
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/vighsandor/testing-and-poc.git
+    targetRevision: main
+    path: metallb-config
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+

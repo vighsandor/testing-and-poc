@@ -1,0 +1,40 @@
+# ApplicationSet - RabbitMQ (poc-app-webui-and-tcp)
+# Webes felület (Gateway API) + AMQP TCP port (LoadBalancer)
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: poc-app-webui-and-tcp
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          # RabbitMQ alkalmazás (Deployment + Service)
+          - name: poc-app-webui-and-tcp
+            path: poc-app-webui-and-tcp
+            namespace: poc-app-webui-and-tcp
+  
+  template:
+    metadata:
+      name: "{{ .name }}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/vighsandor/testing-and-poc.git
+        targetRevision: HEAD
+        path: "{{ .path }}"
+        directory:
+          recurse: false
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .namespace }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+

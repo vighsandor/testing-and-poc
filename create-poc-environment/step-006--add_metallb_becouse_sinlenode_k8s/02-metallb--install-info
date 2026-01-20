@@ -1,0 +1,43 @@
+A telepítés sorrendje
+=====================
+
+# 1. MetalLB telepítése (Helm chart)
+kubectl apply -f 01-metallb.yaml
+
+# 2. Várd meg amíg a MetalLB podok futnak
+kubectl get pods -n metallb-system -w
+
+# 3. MetalLB config (a Git repo-ból) - csak ha már fut a MetalLB!
+kubectl apply -f 03-metallb-config-app.yaml
+
+# VAGY manuálisan (ha nem akarod Git repo-ba tenni):
+kubectl apply -f metallb-config/ipaddresspool.yaml
+kubectl apply -f metallb-config/l2advertisement.yaml
+
+
+Ellenőrzés
+==========
+
+# MetalLB podok
+kubectl get pods -n metallb-system
+
+# Gateway Service - most már kap External-IP-t!
+kubectl get svc -n default gwpoc-gateway-nginx
+```
+
+**Várt eredmény:**
+```
+NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+gwpoc-gateway-nginx   LoadBalancer   10.233.43.156   10.0.0.108    80:30204/TCP   10m
+
+
+Elvárt eredmény
+===============
+
+# /etc/hosts bejegyzés (kliensen):
+# 10.0.0.108 poc-app-only-webui.gwpoc.local
+
+# Böngészőben:
+http://poc-app-only-webui.gwpoc.local/
+
+

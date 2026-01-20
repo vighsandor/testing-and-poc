@@ -1,0 +1,43 @@
+# ApplicationSet - ArgoCD Gateway API route
+# TLSRoute az argocd.gwpoc.local HTTPS eléréséhez
+#
+# FONTOS: A gateway.yaml-t is frissíteni kell a HTTPS passthrough listenerrel!
+#         (lásd gateway-resources/gateway.yaml)
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argocd-gateway-route
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          - name: argocd-route
+            path: argocd-route
+            namespace: argocd
+  
+  template:
+    metadata:
+      name: "{{ .name }}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/vighsandor/testing-and-poc.git
+        targetRevision: HEAD
+        path: "{{ .path }}"
+        directory:
+          recurse: false
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .namespace }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false
+

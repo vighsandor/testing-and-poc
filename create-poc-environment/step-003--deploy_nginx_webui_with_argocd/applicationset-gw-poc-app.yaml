@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: gw-poc-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - name: poc-app-only-webui
+        namespace: gw-poc-app
+
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/vighsandor/testing-and-poc.git
+        targetRevision: main
+        path: poc-app-only-webui
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+

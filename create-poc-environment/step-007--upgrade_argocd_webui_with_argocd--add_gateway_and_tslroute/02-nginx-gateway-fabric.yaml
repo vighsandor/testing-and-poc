@@ -1,0 +1,98 @@
+# NGINX Gateway Fabric 2.3.0 telepítése ArgoCD-vel (Helm chart)
+#
+# ELŐFELTÉTEL: Gateway API CRD-k már telepítve legyenek!
+#
+# Helm chart: oci://ghcr.io/nginx/charts/nginx-gateway-fabric
+# Verzió: 2.3.0
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-gateway-fabric
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"  # CRD-k után, de egyéb appok előtt
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    # OCI Helm registry
+    repoURL: ghcr.io/nginx/charts
+    chart: nginx-gateway-fabric
+    targetRevision: 2.3.0
+    
+    helm:
+      releaseName: ngf
+      
+      # Helm values - testreszabható
+      values: |
+        # NGINX Gateway Fabric konfiguráció
+        
+        # GatewayClass neve (Gateway resources-ben erre kell hivatkozni)
+        nginxGateway:
+          # GatewayClass name
+          gatewayClassName: nginx
+          
+          # Control plane replicas (1 node cluster esetén 1)
+          replicaCount: 1
+          
+          # EXPERIMENTAL FEATURES - TLSRoute támogatáshoz KÖTELEZŐ!
+          gwAPIExperimentalFeatures:
+            enable: true
+          
+          # Logging
+          logging:
+            level: info
+          
+          # Telemetry kikapcsolása (opcionális)
+          productTelemetry:
+            enable: false
+        
+        # NGINX adatplane konfiguráció  
+        nginx:
+          # NGINX OSS (nem Plus)
+          plus: false
+          
+          # Image
+          image:
+            repository: ghcr.io/nginx/nginx-gateway-fabric/nginx
+            tag: "2.3.0"
+            pullPolicy: IfNotPresent
+          
+          # Resource limits (1 node cluster-hez optimalizálva)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        
+        # Service konfiguráció (NodePort bare-metal-hez)
+        # Megjegyzés: A 2.x architektúrában a Service a Gateway létrehozásakor jön létre
+        # Ez a service csak a control plane-hez kell
+        service:
+          create: true
+          type: ClusterIP
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nginx-gateway
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
