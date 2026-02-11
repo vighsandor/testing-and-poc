@@ -12,13 +12,11 @@ metadata:
   namespace: default
 spec:
   gatewayClassName: nginx
-  
-  # Infrastructure - annotációk a létrehozott Service-re
-  # MetalLB IP sharing engedélyezése
+
   infrastructure:
     annotations:
       metallb.io/allow-shared-ip: "gwpoc-shared"
-  
+
   listeners:
     # HTTP listener - webes alkalmazásokhoz
     - name: http
@@ -28,7 +26,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    
+
     # HTTPS passthrough listener - ArgoCD-hez
     - name: https-passthrough
       port: 443
@@ -41,3 +39,13 @@ spec:
           from: All
         kinds:
           - kind: TLSRoute
+
+    # TCP listener - RabbitMQ AMQP (5672)
+    - name: rabbitmq-amqp
+      port: 5672
+      protocol: TCP
+      allowedRoutes:
+        kinds:
+          - kind: TCPRoute
+        namespaces:
+          from: All
