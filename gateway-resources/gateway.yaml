@@ -49,3 +49,13 @@ spec:
           - kind: TCPRoute
         namespaces:
           from: All
+
+    # TCP listener - Kafka (9092)
+    - name: kafka
+      port: 9092
+      protocol: TCP
+      allowedRoutes:
+        kinds:
+          - kind: TCPRoute
+        namespaces:
+          from: All
